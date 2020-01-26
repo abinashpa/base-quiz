@@ -62,8 +62,8 @@ router.put("/:id", (req, res, next) => {
 
 // delete quiz
 router.delete("/:id", (req, res, next) => {
-    try {
-      Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
+  try {
+    Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
       if (err) return next(err);
       if (!quizToDelete)
         return res.json({ success: false, msg: "Quiz Not Found!" });
@@ -75,7 +75,7 @@ router.delete("/:id", (req, res, next) => {
           if (!updatedQuizset)
             return res
               .status(500)
-              .json({ success: false, msg: "Can't Update Quizset" })
+              .json({ success: false, msg: "Can't Update Quizset" });
         }
       );
       res.json({
@@ -83,10 +83,10 @@ router.delete("/:id", (req, res, next) => {
         msg: "Quiz Successfully Deleted",
         quizToDelete
       });
-    } catch (err) {
-      next(err);
-    }
-  });
+    });
+  } catch (err) {
+    next(err)
+  }
 });
 
 module.exports = router;
