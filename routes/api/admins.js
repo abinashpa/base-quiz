@@ -33,22 +33,22 @@ router.post("/signin", (req, res, next) => {
         if (err) return next(err);
         if (!matched)
           return res
-            .status(422)
+            .status(401)
             .json({ success: false, msg: "Invalid Password" });
             
         jwt.sign(
           {
-            userid: admin._id,
+            userId: admin._id,
             username: admin.username,
-            email: admin.email,
-            isadmin: admin.isAdmin
+            email: admin.email
           },
-          "process.env.SECRET",
+          process.env.SECRET,
           (err, token) => {
             if (err) return next(err);
             res.json({
               success: true,
               msg: "You Are Successfully Logged In",
+              id: admin._id,
               token
             });
           }

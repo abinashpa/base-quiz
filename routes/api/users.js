@@ -43,7 +43,7 @@ router.post("/signin", (req, res, next) => {
           process.env.SECRET,
           (err, token) => {
             if (err) return next(err);
-            res.json({ success: true, msg: "You Are Logged In", token });
+            res.json({ success: true, msg: "You Are Logged In", id:user._id, token });
           }
         );
       });
@@ -92,7 +92,7 @@ router.put("/:id", (req, res, next) => {
       (err, user) => {
         if (err) return next(err);
         if (!user) return res.json({ success: false, msg: "user not found!" });
-        res.json({ user, success: true });
+        res.json({ user, success: true, msg:"Profile Is Updated" });
       }
     );
   } catch (err) {
@@ -139,7 +139,7 @@ router.delete("/:id", (req, res, next) => {
 // get current user
 router.get("/me", (req, res, next) => {
   try {
-    const { username } = req.user;
+    const { username } = req.body.user;
     User.findOne({ username }, "-password").exec((err, user) => {
       if (err) return next(err);
       if (!user) {

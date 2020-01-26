@@ -6,11 +6,10 @@ exports.verifyToken = (req, res, next) => {
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) return next(err);
       req.user = {
-        userid: decoded.userid,
+        userId: decoded.userId,
         email: decoded.email,
-        token,
         username: decoded.username,
-        isadmin: decoded.isadmin
+        token
       };
       next();
     });

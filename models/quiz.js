@@ -27,9 +27,10 @@ const quizSchema = new Schema({
     type: String,
     required: true
   },
-  author: {
+  authorId: {
     type: Schema.Types.ObjectId,
-    ref: "Admin"
+    ref: "Admin",
+    required: true
   }
 }, { timeStamps:true });
 
