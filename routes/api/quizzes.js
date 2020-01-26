@@ -62,8 +62,8 @@ router.put("/:id", (req, res, next) => {
 
 // delete quiz
 router.delete("/:id", (req, res, next) => {
-  Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
     try {
+      Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
       if (err) return next(err);
       if (!quizToDelete)
         return res.json({ success: false, msg: "Quiz Not Found!" });
