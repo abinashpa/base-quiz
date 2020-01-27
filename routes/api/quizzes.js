@@ -23,6 +23,27 @@ router.get("/", (req, res, next) => {
   }
 });
 
+// single quiz
+router.get("/:id", (req, res, next) => {
+  try {
+    Quiz.findById(req.params.id, (err, quiz) => {
+      if (err) {
+        next(err)
+      }
+      else if (!quiz) {
+        res
+        .status(400)
+        .json({ success:false, msg:"Quiz Not Found" })
+      }
+      else {
+        res.json(quiz)
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
 // verify jwt
 router.use(auth.verifyToken);
 
@@ -62,15 +83,14 @@ router.put("/:id", (req, res, next) => {
         return next(err);
       }
       if (req.body.authorId === quiz.authorId) {
-        Quiz.findByIdAndUpdate(req.params.id, req.body, (err, quizToUpdate) => {
+        Quiz.findByIdAndUpdate(req.params.id, req.body, (err, UpdatedQuiz) => {
           if (err) return next(err);
-          if (!quizToUpdate) {
+          if (!UpdatedQuiz) {
             return res
               .status(400)
               .json({ success: false, msg: "Quiz Not Found" });
           }
-
-          res.json({ success: true, quizToUpdate });
+          res.json({ success: true, msg: "Quiz Updated" });
         });
       }
     });
@@ -86,22 +106,12 @@ router.delete("/:id", (req, res, next) => {
       if (err) {
         next(err);
       }
-      if (req.body.authorId === quiz.authorId) {
+
+      if (req.user.userId == quiz.authorId) {
         Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
           if (err) return next(err);
           if (!quizToDelete)
             return res.json({ success: false, msg: "Quiz Not Found!" });
-          Quizset.findOneAndUpdate(
-            { topic: quizToDelete.quizset },
-            { $pull: { quiz: quizToDelete._id } },
-            (err, updatedQuizset) => {
-              if (err) return next(err);
-              if (!updatedQuizset)
-                return res
-                  .status(500)
-                  .json({ success: false, msg: "Can't Update Quizset" });
-            }
-          );
           res.json({
             success: true,
             msg: "Quiz Successfully Deleted",
@@ -117,13 +127,22 @@ router.delete("/:id", (req, res, next) => {
   }
 });
 
-router.get("/list", (req, res) => {
+// list of quizzes created by current admin
+router.get("/list", (req, res, next) => {
   try {
-    Quiz.find({ authorId: req.body.id }, (err, list) => {
-      res.json({ list });
+    Quiz.find({}, (err, list) => {
+      if (error) {
+         next(err)
+      }
+      else if (!list) {
+        res.json({ success: false, msg: "Quiz Not Found" })
+      }
+      else {
+        res.json({ list });
+      }
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
