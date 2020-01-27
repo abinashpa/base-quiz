@@ -100,24 +100,6 @@ router.put("/:id", (req, res, next) => {
   }
 });
 
-// update some info of user
-router.patch("/:id", (req, res, next) => {
-  try {
-    User.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true },
-      (err, user) => {
-        if (err) return next(err);
-        if (!user) return res.json({ success: false, msg: "user not found!" });
-        res.json({ user, success: true });
-      }
-    );
-  } catch (err) {
-    next(err);
-  }
-});
-
 // delete a user
 router.delete("/:id", (req, res, next) => {
   try {

@@ -130,10 +130,11 @@ router.delete("/:id", (req, res, next) => {
 // list of quizzes created by current admin
 router.get("/list", (req, res, next) => {
   try {
-    Quiz.find({}, (err, list) => {
+    Quiz.find({ authorId: req.user.userId }, (err, list) => {
       if (error) {
          next(err)
       }
+
       else if (!list) {
         res.json({ success: false, msg: "Quiz Not Found" })
       }
