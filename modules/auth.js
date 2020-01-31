@@ -14,6 +14,6 @@ exports.verifyToken = (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json({ success: false, message: "Token not found" });
+    res.status(401).json({ success: false, msg: "Token not found" });
   }
 };

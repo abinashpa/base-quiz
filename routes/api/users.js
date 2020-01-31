@@ -10,7 +10,7 @@ const userController = require("../../controllers/users")
 router.post("/", userController.registerUser);
 
 // login user
-router.post("/login", auth.verifyToken, userController.loginUser);
+router.post("/login", userController.loginUser);
 
 // update user
 router.put("/:id", auth.verifyToken, isUser.checkDb, userController.updateUser);

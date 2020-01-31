@@ -26,8 +26,6 @@ module.exports = {
         try {
             const { email, password } = req.body.user;
             Admin.findOne({ email }, (err, admin) => {
-                console.log(admin, err);
-                
                 if (err) return next(err);
                 if (!admin) return res.json({ success: false, msg: "Invalid Email" });
                 admin.verifyPassword(password, (err, matched) => {
