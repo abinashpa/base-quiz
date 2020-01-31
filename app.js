@@ -7,10 +7,10 @@ const mongoose = require("mongoose");
 const helmet = require("helmet");
 
 // routes files
-const indexRouter = require("./routes/index");
 const usersApiRouter = require("./routes/api/users");
 const adminsApiRouter = require("./routes/api/admins");
 const quizzesApiRouter = require("./routes/api/quizzes");
+const indexRouter = require("./routes/index");
 
 const app = express();
 
