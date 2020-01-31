@@ -3,7 +3,7 @@ const router = express.Router();
 
 const auth = require("../../modules/auth");
 const Quiz = require("../../models/quiz");
-const Admin = require("../../models/admin");
+const isAdmin = require("../../modules/isAdmin")
 
 // list all quiz
 router.get("/", (req, res, next) => {
@@ -16,7 +16,9 @@ router.get("/", (req, res, next) => {
           return res
             .status(400)
             .json({ success: false, msg: "No quizzes found!" });
-        res.json({ quizzes, success: true });
+        else {
+          res.json({ quizzes, success: true });
+        }
       });
   } catch (err) {
     next(err);
@@ -32,8 +34,8 @@ router.get("/:id", (req, res, next) => {
       }
       else if (!quiz) {
         res
-        .status(400)
-        .json({ success:false, msg:"Quiz Not Found" })
+          .status(400)
+          .json({ success: false, msg: "Quiz Not Found" })
       }
       else {
         res.json(quiz)
@@ -47,17 +49,12 @@ router.get("/:id", (req, res, next) => {
 // verify jwt
 router.use(auth.verifyToken);
 
+// check admin in database
+router.use(isAdmin.checkDb);
+
 // create quiz
 router.post("/", (req, res, next) => {
   try {
-    Admin.findById(req.body.authorId, (err, author) => {
-      if (err) {
-        return next(err);
-      }
-      if (!author) {
-        return res.status(401).json({ success: false, msg: "Unauthorized" });
-      }
-    });
     Quiz.create(req.body, (err, quizToCreate) => {
       if (err) return next(err);
       if (!quizToCreate) {
@@ -78,20 +75,17 @@ router.post("/", (req, res, next) => {
 // update quiz
 router.put("/:id", (req, res, next) => {
   try {
-    Quiz.findById(req.params.id, (err, quiz) => {
-      if (err) {
-        return next(err);
+    Quiz.findByIdAndUpdate(req.params.id, req.body, (err, UpdatedQuiz) => {
+      if (err) return next(err);
+      if (!UpdatedQuiz) {
+        return (
+          res
+            .status(400)
+            .json({ success: false, msg: "Quiz Not Found" })
+        )
       }
-      if (req.body.authorId === quiz.authorId) {
-        Quiz.findByIdAndUpdate(req.params.id, req.body, (err, UpdatedQuiz) => {
-          if (err) return next(err);
-          if (!UpdatedQuiz) {
-            return res
-              .status(400)
-              .json({ success: false, msg: "Quiz Not Found" });
-          }
-          res.json({ success: true, msg: "Quiz Updated" });
-        });
+      else {
+        res.json({ success: true, msg: "Quiz Updated" });
       }
     });
   } catch (err) {
@@ -102,25 +96,15 @@ router.put("/:id", (req, res, next) => {
 // delete quiz
 router.delete("/:id", (req, res, next) => {
   try {
-    Quiz.findById(req.params.id, (err, quiz) => {
-      if (err) {
-        next(err);
-      }
-
-      if (req.user.userId == quiz.authorId) {
-        Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
-          if (err) return next(err);
-          if (!quizToDelete)
-            return res.json({ success: false, msg: "Quiz Not Found!" });
-          res.json({
-            success: true,
-            msg: "Quiz Successfully Deleted",
-            quizToDelete
-          });
-        });
-      } else {
-        return res.status(401).json({ success: false, msg: "Unauthorized" });
-      }
+    Quiz.findByIdAndDelete(req.params.id, (err, quizToDelete) => {
+      if (err) return next(err);
+      if (!quizToDelete)
+        return res.json({ success: false, msg: "Quiz Not Found!" });
+      res.json({
+        success: true,
+        msg: "Quiz Successfully Deleted",
+        quizToDelete
+      });
     });
   } catch (err) {
     next(err);
@@ -128,23 +112,25 @@ router.delete("/:id", (req, res, next) => {
 });
 
 // list of quizzes created by current admin
-router.get("/list", (req, res, next) => {
+router.get("/list", async (req, res, next) => {
   try {
-    Quiz.find({ authorId: req.user.userId }, (err, list) => {
-      if (error) {
-         next(err)
-      }
+    const list = await Quiz.find({ authorId: req.user.userId });
+    
+    if (error) {
+      next(err)
+    }
 
-      else if (!list) {
-        res.json({ success: false, msg: "Quiz Not Found" })
-      }
-      else {
-        res.json({ list });
-      }
-    });
+    else if (!list) {
+      res.json({ success: false, msg: "Quiz Not Found" })
+    }
+    else {
+      res.json({ list });
+    }
+    
   } catch (err) {
     next(err);
   }
 });
+
 
 module.exports = router;

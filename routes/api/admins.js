@@ -12,6 +12,7 @@ router.post("/", (req, res, next) => {
         return res
           .status(500)
           .json({ msg: "Something Went Wrong", success: false });
+          
       res.json({
         success: true,
         msg: "You Are Successfully Registered As Admin"
@@ -22,10 +23,11 @@ router.post("/", (req, res, next) => {
   }
 });
 
+
 // login Admin
 router.post("/signin", (req, res, next) => {
   try {
-    let { email, password } = req.body.user;
+    const { email, password } = req.body.user;
     Admin.findOne({ email }, (err, admin) => {
       if (err) return next(err);
       if (!admin) return res.json({ success: false, msg: "Invalid Email!" });
@@ -53,6 +55,7 @@ router.post("/signin", (req, res, next) => {
             });
           }
         );
+
       });
     });
   } catch (err) {

@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../../models/user");
 const jwt = require("jsonwebtoken");
 const auth = require("../../modules/auth");
+const isUser = require("../../modules/isUser")
 const router = express.Router();
 
 // create new user
@@ -81,6 +82,9 @@ router.get("/:id", (req, res, next) => {
 
 // verify jwt
 router.use(auth.verifyToken);
+
+// verify user in database
+router.use(isUser.checkDb);
 
 // update user
 router.put("/:id", (req, res, next) => {
