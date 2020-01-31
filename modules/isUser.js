@@ -5,10 +5,10 @@ exports.checkDb = async (req, res, next) => {
         const user = await User.findById(req.user.userId)
         if (!user) {
             res.status(401).json({ success: false, msg: "Unauthorized" })
+            return
         }
-        else {
-            next()
-        }
+        next()
+
     } catch (err) {
         next(err)
     }

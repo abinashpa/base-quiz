@@ -34,10 +34,10 @@ mongoose.connect(
 );
 
 // routes
-app.use("/", indexRouter);
-app.use("/api/v1/users", usersApiRouter);
-app.use("/api/v1/admins", adminsApiRouter);
 app.use("/api/v1/quizzes", quizzesApiRouter);
+app.use("/api/v1/admins", adminsApiRouter);
+app.use("/api/v1/users", usersApiRouter);
+app.use("/", indexRouter);
 
 // error handlers
 app.use((err, req, res, next) => {
