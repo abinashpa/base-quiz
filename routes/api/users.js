@@ -13,6 +13,9 @@ router.post("/", userController.registerUser);
 router.post("/login", userController.loginUser);
 
 // update user
-router.put("/:id", auth.verifyToken, isUser.checkDb, userController.updateUser);
+router.put("/:id", auth.verifyToken, userController.updateUser);
+
+// get about user
+router.get("/me", auth.verifyToken, userController.aboutUser)
 
 module.exports = router;

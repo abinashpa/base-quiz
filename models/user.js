@@ -11,7 +11,8 @@ const userSchema = new Schema({
     type: String,
     match: /@/,
     unique: true,
-    required: true
+    required: true,
+    lowercase: true
   },
   password: {
     type: String,
@@ -21,21 +22,19 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
-}, { timeStamps:true } );
+}, { timeStamps: true });
 
-userSchema.pre("save", function(next) {
+userSchema.pre("save", async function (next) {
   if (this.password && this.isModified("password")) {
-    bcrypt.hash(this.password, 10, (err, password) => {
-      if (err) return next(err);
-      this.password = password;
-      next();
-    });
-  } else {
-    next();
+    const encryptedPassword = await bcrypt.hash(this.password, 10)
+    console.log(encryptedPassword, this);
+    if (encryptedPassword) this.password = encryptedPassword;
   }
+  next();
 });
 
-userSchema.methods.verifyPassword = function(password, done) {
+
+userSchema.methods.verifyPassword = function (password, done) {
   bcrypt.compare(password, this.password, (err, matched) => {
     if (err) return done(null, false);
     done(null, matched);

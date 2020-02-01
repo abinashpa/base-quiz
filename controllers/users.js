@@ -32,7 +32,7 @@ module.exports = {
                         return res.status(401).json({ success: false, msg: "Unauthorized" });
                     jwt.sign(
                         {
-                            userid: user._id,
+                            userId: user._id,
                             username: user.username,
                             email: user.email,
                             isadmin: user.isAdmin
@@ -50,20 +50,28 @@ module.exports = {
         }
     },
 
-    updateUser: (req, res, next) => {
+    updateUser: async (req, res, next) => {
         try {
-            User.findByIdAndUpdate(
-                req.params.id,
-                req.body,
-                { new: true },
-                (err, user) => {
-                    if (err) return next(err);
-                    if (!user) return res.json({ success: false, msg: "user not found!" });
-                    res.json({ user, success: true, msg: "Profile Is Updated" });
-                }
-            );
+            const user = await User.findByIdAndUpdate(req.params.id, req.body)
+            if (!user) return (
+                res
+                    .status(400)
+                    .json({ success: false, msg: "User Not Found" })
+            )
+            res.json({ success: true, msg: "Profile Is Updated" });
+            
         } catch (err) {
             next(err);
+        }
+    },
+
+    aboutUser: async (req, res, next) => {
+        try {
+            const user = await User.findById(req.user.userId, "-password");
+            if (!user) return res.status(400).json({ success: false, msg: "User Not Found" });
+            res.json({ success: true, user });
+        } catch (err) {
+            next(err)
         }
     }
 }

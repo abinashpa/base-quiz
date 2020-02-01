@@ -24,14 +24,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // connecting to mongodb
-mongoose.set('useFindAndModify', false);
+const mongoUrl = "mongodb+srv://abinash:12345@cluster0-jsp3p.mongodb.net/test?retryWrites=true&w=majority"
 mongoose.connect(
-  "mongodb://localhost/base-quiz",
+  mongoUrl,
   { useNewUrlParser: true, useUnifiedTopology: true },
   err => {
     console.log(err ? err : "mongoDB connected");
   }
 );
+mongoose.set('useFindAndModify', false);
 
 // routes
 app.use("/api/v1/quizzes", quizzesApiRouter);
