@@ -39,7 +39,10 @@ mongoose.set('useFindAndModify', false);
 app.use("/api/v1/quizzes", quizzesApiRouter);
 app.use("/api/v1/admins", adminsApiRouter);
 app.use("/api/v1/users", usersApiRouter);
-app.use("/", indexRouter);
+// app.use("*", indexRouter);
+app.use('*', (req, res, next) => {
+  res.sendFile(path.resolve(__dirname, 'public/'+ 'index.html'))
+});
 
 // error handlers
 app.use((err, req, res, next) => {
