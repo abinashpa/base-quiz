@@ -14,7 +14,7 @@ const indexRouter = require("./routes/index");
 
 const app = express();
 
-// helmet for basic security
+// helmet for security
 app.use(helmet())
 
 // middleware
@@ -24,10 +24,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // connecting to mongodb
-const mongoUrl = "mongodb+srv://abinash:12345@cluster0-jsp3p.mongodb.net/test?retryWrites=true&w=majority"
-
 mongoose.connect(
-  mongoUrl,
+  process.env.ATLAS,
   { useNewUrlParser: true, useUnifiedTopology: true },
   err => {
     console.log(err ? err : "mongoDB connected");
@@ -40,8 +38,8 @@ app.use("/api/v1/quizzes", quizzesApiRouter);
 app.use("/api/v1/admins", adminsApiRouter);
 app.use("/api/v1/users", usersApiRouter);
 // app.use("*", indexRouter);
-app.use('*', (req, res, next) => {
-  res.sendFile(path.resolve(__dirname, 'public/'+ 'index.html'))
+app.get('*', (req, res, next) => {
+  res.sendFile(path.resolve(__dirname, "public/index.html"))
 });
 
 // error handlers

@@ -33,7 +33,6 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-
 userSchema.methods.verifyPassword = function (password, done) {
   bcrypt.compare(password, this.password, (err, matched) => {
     if (err) return done(null, false);
