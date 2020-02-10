@@ -1,11 +1,11 @@
 const Quiz = require("../models/quiz");
+const Quizset = require("../models/quizset");
 
 module.exports = {
 
     listQuiz: (req, res, next) => {
         try {
-            Quiz.find({})
-                .populate("authorId")
+            Quiz.find({}, "-authorId")
                 .exec((err, quizzes) => {
                     if (err) return next(err);
                     if (!quizzes)
@@ -23,17 +23,30 @@ module.exports = {
 
     createQuiz: (req, res, next) => {
         try {
-            Quiz.create(req.body, (err, quizToCreate) => {
+            Quiz.create(req.body, (err, newQuiz) => {
                 if (err) return next(err);
-                if (!quizToCreate) {
-                    return res.status(400).json({ success: false, msg: "No Quiz Found" });
+                if (!newQuiz) {
+                    return res.status(400).json({ success: false, msg: "Quiz Not Created" });
+                }
+                if (newQuiz) {
+                    Quizset.findByIdAndUpdate(req.body.quizset_id, {
+                        $push: { questions: newQuiz._id }
+                    }, (err, updatedQuizset) => {
+                        if (err) {
+                            res
+                                .status(500)
+                                .json({ success: true, msg: "something went wrong" });
+                        }
+                        if (updatedQuizset) {
+                            res.status(200).json({
+                                success: true,
+                                msg: "Quiz created Successfully!",
+                            });
+                        }
+                    });
                 }
 
-                res.status(200).json({
-                    success: true,
-                    msg: "Quiz created Successfully!",
-                    quizToCreate
-                });
+
             });
         } catch (err) {
             next(err);
@@ -42,7 +55,7 @@ module.exports = {
 
     singleQuiz: (req, res, next) => {
         try {
-            Quiz.findById(req.params.id, (err, quiz) => {
+            Quiz.findById(req.params.id, "-__v", (err, quiz) => {
                 if (err) {
                     next(err)
                 }
@@ -94,6 +107,20 @@ module.exports = {
             });
         } catch (err) {
             next(err);
+        }
+    },
+
+    getQuizOfQuizset: async (req, res, next) => {
+        try {
+            listQuestions = await Quizset.findById(req.params.id, "-__v" )
+            .populate("questions", "-__v -_id -authorId -answer")
+            if (listQuestions) {
+                res.json({ success: true, listQuestions })
+            } else {
+                res.json({ success: false, msg: "Something Went Wrong" });
+            }
+        } catch (err) {
+            next(err)
         }
     }
 }

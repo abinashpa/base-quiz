@@ -6,6 +6,10 @@ const quizSchema = new Schema({
     type: String,
     required: true
   },
+  quizset:{
+    type: String,
+    required: true
+  },
   option1: {
     type: String,
     required: true
@@ -20,10 +24,6 @@ const quizSchema = new Schema({
     required: true
   },
   answer: {
-    type: String,
-    required: true
-  },
-  quizset: {
     type: String,
     required: true
   },

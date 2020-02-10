@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+
 const Schema = mongoose.Schema;
 
 const adminSchema = new Schema(
@@ -20,7 +21,11 @@ const adminSchema = new Schema(
     },
     id: {
       type: Schema.Types.ObjectId
-    }
+    },
+    isAdmin: {
+      type: Boolean,
+      value: true
+    },
   },
   { timeStamps: true }
 );

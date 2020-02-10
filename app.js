@@ -1,7 +1,6 @@
 // modules
 const express = require("express");
 const path = require("path");
-const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
@@ -9,12 +8,15 @@ const helmet = require("helmet");
 // routes files
 const usersApiRouter = require("./routes/api/users");
 const adminsApiRouter = require("./routes/api/admins");
+const quizsetApiRouter = require("./routes/api/quizset");
 const quizzesApiRouter = require("./routes/api/quizzes");
-const indexRouter = require("./routes/index");
 
 const app = express();
 
-// helmet for security
+// environmental variable
+require('dotenv').config()
+
+// helmet for Protection
 app.use(helmet())
 
 // middleware
@@ -37,6 +39,9 @@ mongoose.set('useFindAndModify', false);
 app.use("/api/v1/quizzes", quizzesApiRouter);
 app.use("/api/v1/admins", adminsApiRouter);
 app.use("/api/v1/users", usersApiRouter);
+app.use("/api/v1/quizset", quizsetApiRouter);
+
+// sending index.html from public
 app.get('*', (req, res, next) => {
   res.sendFile(path.resolve(__dirname, "public/index.html"))
 });

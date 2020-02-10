@@ -19,9 +19,9 @@ const userSchema = new Schema({
     required: true
   },
   score: {
-    type: Number,
-    default: 0
-  },
+    type: Schema.Types.ObjectId,
+    ref:"Score"
+  }
 }, { timeStamps: true });
 
 userSchema.pre("save", async function (next) {
