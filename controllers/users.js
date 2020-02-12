@@ -5,31 +5,19 @@ const Score = require("../models/score");
 const Quizset = require("../models/quizset");
 
 module.exports = {
-    registerUser: (req, res, next) => {
+    registerUser: async (req, res, next) => {
         try {
-            User.create(req.body.user, (err, user) => {
-                if (err) return next(err);
-                if (!user) {
-                    return res
-                        .status(400)
-                        .json({ msg: "Please Try Again", success: false });
+            const user = await User.create(req.body.user);
+            if (user) {
+                const score = await Score.create({});
+                if (score) {
+                    user.score = score._id;
+                    user.save()
+                    res
+                        .status(200)
+                        .json({ success: true, msg: "You Are Successfully Registered" });
                 }
-                Score.create({}, (err, score) => {
-                    console.log(err, score);
-                    if (err) {
-                        res
-                            .status(500)
-                            .json({ success: false, msg: "Something went wrong" })
-                    }
-                    else if (score) {
-                        user.score = score._id;
-                        user.save()
-                        res
-                            .status(200)
-                            .json({ success: true, msg: "You Are Successfully Registered" });
-                    }
-                })
-            });
+            }
         } catch (err) {
             next(err);
         }
@@ -111,25 +99,21 @@ module.exports = {
             quizset = await Quizset.findById(req.body.quizset_id).populate("questions");
             const outof = quizset.questions.length;
             let totalMarks = 0;
-
             if (quizset) {
                 quizset.questions.map((val, ind) => {
                     if (val.answer == req.body.result[ind]) {
                         ++totalMarks
                     }
                 });
-
                 const userData = await User.findById(req.user.userId);
                 const oldScore = await Score.findByIdAndUpdate(
                     userData.score, {
                     $push: { scoreboard: { score: totalMarks, outof: outof, category: quizset.name } }
                 });
-
                 if (oldScore) {
                     res.json({ success: true, msg: "Your Score Has Submitted" });
                 }
             }
-
             if (!quizset) {
                 res
                     .status(500)
